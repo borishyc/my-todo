@@ -1,7 +1,7 @@
 {
   "name": "My To-Do",
   "short_name": "To-Do",
-  "description": "四碼日期快速輸入的離線代辦事項 App",
+  "description": "Google 登入同步的待辦事項 App",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
