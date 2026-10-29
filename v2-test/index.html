@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#126b91">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My To-Do">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>My To-Do V2 測試</title>
+<style>.cloud-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:16px;padding:10px;border:1px solid #d6e3eb;border-radius:8px}.cloud-bar button{border:0;border-radius:6px;padding:10px;background:#126b91;color:white}.cloud-bar small{color:#507283}.entry button:disabled{opacity:.5;cursor:not-allowed}@media(max-width:600px){.cloud-bar{font-size:13px}}</style>
+</head>
+<body>
+<main class="app" id="app">
+  <section class="board" aria-label="代辦事項 App">
+    <header class="topbar">
+      <div><h1>My To-Do</h1><p>前 4 碼為月日，例如 1030提供下蓋樣品30PCS</p></div>
+      <button id="installBtn" class="install" type="button" hidden>安裝 App</button>
+    </header>
+
+    <div class="cloud-bar"><button id="loginBtn" type="button">使用 Google 登入</button><button id="logoutBtn" type="button" hidden>登出</button><span id="loginInfo">尚未登入</span><small id="syncStatus" role="status">請先登入 Google 帳號</small></div>
+    <div class="head"><span>日期</span><span>事項</span></div>
+    <div id="activeList" aria-live="polite"></div>
+    <p id="swipeHint" class="hint">按住事項向右滑，左側會顯示「完成」</p>
+    <div class="space"></div>
+
+    <section id="doneArea" class="done-area" hidden>
+      <h2>已完成</h2>
+      <div id="doneList"></div>
+    </section>
+
+    <form id="todoForm" class="entry" novalidate>
+      <label class="sr-only" for="todoInput">四碼日期與代辦事項</label>
+      <input id="todoInput" type="text" maxlength="104" autocomplete="off" placeholder="例如：1030提供下蓋樣品30PCS">
+      <button class="send" type="submit">送出</button>
+      <div id="error" class="error" aria-live="polite"></div>
+    </form>
+    <div id="live" class="sr-only" aria-live="polite"></div>
+  </section>
+</main>
+<script type="module" src="firebase-app.js"></script>
+</body>
+</html>
