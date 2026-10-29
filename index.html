@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#126b91">
+  <meta name="theme-color" content="#0e7490">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="My To-Do">
@@ -16,13 +16,14 @@
 <main class="app" id="app">
   <section class="board" aria-label="代辦事項 App">
     <header class="topbar">
-      <div><h1>My To-Do</h1><p>前 4 碼為月日，例如 1030提供下蓋樣品30PCS</p></div>
-      <button id="installBtn" class="install" type="button" hidden>安裝 App</button>
+      <div><div class="eyebrow">MY WORKSPACE</div><h1>My To-Do <span class="v-label">雲端版</span></h1><p>快速記下每一件重要的事</p></div>
+      
     </header>
 
-    <div class="head"><span>日期</span><span>事項</span></div>
+    <div class="cloud-bar"><span id="syncStatus" class="status" role="status">準備連線</span><button id="loginBtn" type="button" class="auth-btn">Google 登入</button><button id="logoutBtn" type="button" class="logout-btn" hidden>登出</button><span id="loginInfo" class="sr-only">尚未登入</span></div>
+    <div class="section-heading"><h2>待辦清單</h2><span>向右滑動完成事項</span></div><div class="head"><span>日期</span><span>事項</span></div>
     <div id="activeList" aria-live="polite"></div>
-    <p id="swipeHint" class="hint">按住事項向右滑，左側會顯示「完成」</p>
+    <p id="swipeHint" class="hint">向右滑動事項即可完成</p>
     <div class="space"></div>
 
     <section id="doneArea" class="done-area" hidden>
@@ -33,12 +34,12 @@
     <form id="todoForm" class="entry" novalidate>
       <label class="sr-only" for="todoInput">四碼日期與代辦事項</label>
       <input id="todoInput" type="text" maxlength="104" autocomplete="off" placeholder="例如：1030提供下蓋樣品30PCS">
-      <button class="send" type="submit">送出</button>
+      <button class="send" type="submit">新增 <span aria-hidden="true">＋</span></button>
       <div id="error" class="error" aria-live="polite"></div>
     </form>
     <div id="live" class="sr-only" aria-live="polite"></div>
   </section>
 </main>
-<script src="app.js" defer></script>
+<script type="module" src="firebase-app.js"></script>
 </body>
 </html>
