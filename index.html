@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="My To-Do">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261030e">
   <title>My To-Do</title>
 </head>
 <body>
@@ -21,7 +21,7 @@
     </header>
     <div class="head"><span>日期</span><span>事項</span></div>
     <div id="activeList" aria-live="polite"></div>
-    <p id="swipeHint" class="hint">按住事項向右滑，左側會顯示「完成」</p>
+    <p id="swipeHint" class="hint">向右滑完成、向左滑刪除</p>
     <div class="space"></div>
 
     <section id="doneArea" class="done-area" hidden>
@@ -38,6 +38,6 @@
     <div id="live" class="sr-only" aria-live="polite"></div>
   </section>
 </main>
-<script type="module" src="firebase-app.js"></script>
+<script type="module" src="firebase-app.js?v=20261030e"></script>
 </body>
 </html>
