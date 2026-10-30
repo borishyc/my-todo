@@ -26,3 +26,6 @@ html,body{height:100%;overflow:hidden}.app{height:100dvh;padding:12px;overflow:h
 .card .date,.done .date{display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.12}.date-week{font-size:.75em;font-weight:600;opacity:.85}
 .head,.card,.done{grid-template-columns:90px minmax(0,1fr)}
 @media(max-width:600px){.head,.card,.done{grid-template-columns:67px minmax(0,1fr)}}
+
+/* Hide unused validation row below the mobile composer */
+.entry .error:empty{display:none;min-height:0}.entry{row-gap:0}.entry .error:not(:empty){margin-top:8px}
