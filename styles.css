@@ -19,5 +19,5 @@ html,body{height:100%;overflow:hidden}.app{height:100dvh;padding:12px;overflow:h
 @media(prefers-color-scheme:dark){.card.due-today{background:#754553;color:#fff2f5;border-left-color:#eb9ab5}.card.due-soon{background:#69582e;color:#fff3d0;border-left-color:#dec16f}.card.due-today .date{color:#ffd7e2}.card.due-soon .date{color:#ffe8a1}}
 
 /* Date labels with weekdays */
-.head,.card,.done{grid-template-columns:165px 1fr}
-@media(max-width:600px){.head,.card,.done{grid-template-columns:132px minmax(0,1fr);gap:6px}.date{font-size:14px}.card .text,.done .text{font-size:16px}}
+.head,.card,.done{grid-template-columns:120px 1fr}
+@media(max-width:600px){.head,.card,.done{grid-template-columns:99px minmax(0,1fr);gap:6px}.date{font-size:14px}.card .text,.done .text{font-size:16px}}
