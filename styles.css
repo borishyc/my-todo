@@ -21,3 +21,8 @@ html,body{height:100%;overflow:hidden}.app{height:100dvh;padding:12px;overflow:h
 /* Date labels with weekdays */
 .head,.card,.done{grid-template-columns:120px 1fr}
 @media(max-width:600px){.head,.card,.done{grid-template-columns:99px minmax(0,1fr);gap:6px}.date{font-size:14px}.card .text,.done .text{font-size:16px}}
+
+/* Show weekday beneath month/day in task cards */
+.card .date,.done .date{display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.12}.date-week{font-size:.75em;font-weight:600;opacity:.85}
+.head,.card,.done{grid-template-columns:90px minmax(0,1fr)}
+@media(max-width:600px){.head,.card,.done{grid-template-columns:67px minmax(0,1fr)}}
