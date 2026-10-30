@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="My To-Do">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=20261030tidy1">
+  <link rel="stylesheet" href="styles.css?v=20261030layout2">
   <title>TIDY · My To-Do</title>
 </head>
 <body>
@@ -19,15 +19,16 @@
       <div class="tidy-brand"><div class="tidy-mark"><h1>TIDY</h1><span class="tidy-wave" aria-hidden="true"></span></div><p class="tidy-tagline">Plan clearly.<br>Work smoothly.</p></div>
       <div class="cloud-bar"><span id="syncStatus" class="status" role="status">準備連線</span><button id="loginBtn" type="button" class="auth-btn">Google 登入</button><button id="logoutBtn" type="button" class="logout-btn" hidden>登出</button><span id="loginInfo" class="sr-only">尚未登入</span></div>
     </header>
+    <div class="list-scroll" id="listScroll">
     <div class="head"><span>日期</span><span>事項</span></div>
     <div id="activeList" aria-live="polite"></div>
     <p id="swipeHint" class="hint">向右滑完成、向左滑刪除</p>
-    <div class="space"></div>
 
     <section id="doneArea" class="done-area" hidden>
       <h2>已完成</h2>
       <div id="doneList"></div>
     </section>
+    </div>
 
     <form id="todoForm" class="entry" novalidate>
       <label class="sr-only" for="todoInput">四碼日期與代辦事項</label>
@@ -38,6 +39,6 @@
     <div id="live" class="sr-only" aria-live="polite"></div>
   </section>
 </main>
-<script type="module" src="firebase-app.js?v=20261030e"></script>
+<script type="module" src="firebase-app.js?v=20261030layout2"></script>
 </body>
 </html>
