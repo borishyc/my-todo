@@ -7,6 +7,7 @@ const $=q=>document.querySelector(q),active=$('#activeList'),done=$('#doneList')
 let tasks=[],user=null,received=false,connected=false,busy=false,openId=null,unsubTasks=null,unsubConn=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateText=s=>{const [y,m,d]=s.split('-').map(Number);const day=new Date(y,m-1,d).getDay();return m+'/'+String(d).padStart(2,'0')+'('+'日一二三四五六'[day]+')'};
+const dateMarkup=s=>{const label=dateText(s);const i=label.indexOf('(');return '<span class="date-main">'+label.slice(0,i)+'</span><span class="date-week">'+label.slice(i)+'</span>'};
 const dateStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
 const stamp=d=>new Intl.DateTimeFormat('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d).replace(/：/g,':');
 function parse(raw){const v=raw.trim(),code=v.slice(0,4),text=v.slice(4).trim();if(!/^\d{4}$/.test(code))return{error:'請在開頭輸入四碼日期，例如 1030下蓋試模'};if(!text)return{error:'請在四碼日期後輸入事項'};const m=Number(code.slice(0,2)),day=Number(code.slice(2));if(m<1||m>12)return{error:'月份必須介於 01 到 12'};const now=new Date();let y=now.getFullYear();let d=new Date(y,m-1,day);if(d.getMonth()!==m-1||d.getDate()!==day)return{error:'日期不存在'};if(d<dateStart(now))y++;if(new Date(y,m-1,day).getMonth()!==m-1)return{error:'日期不存在'};return{date:y+'-'+String(m).padStart(2,'0')+'-'+String(day).padStart(2,'0'),text}}
@@ -19,9 +20,9 @@ function render(){
  if(!user||!received){active.innerHTML='<div class="empty">'+(!user?'請先登入 Google 帳號':'正在讀取雲端事項…')+'</div>';doneArea.hidden=hint.hidden=true;return}
  const pending=tasks.filter(t=>!t.completedAt).sort((a,b)=>a.date.localeCompare(b.date));
  const complete=tasks.filter(t=>t.completedAt).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
- active.innerHTML=pending.length?pending.map(t=>'<div class="row"><button type="button" class="complete" data-complete="'+esc(t.id)+'" tabindex="-1">完成</button><button type="button" class="delete" data-delete="'+esc(t.id)+'" tabindex="-1">刪除</button><div class="card'+dueClass(t.date)+'" data-card="'+esc(t.id)+'" style="transform:translateX('+(openId===t.id?110:openId==='-'+t.id?-110:0)+'px)" tabindex="0"><div class="date">'+dateText(t.date)+'</div><div class="text">'+esc(t.text)+'</div></div></div>').join(''):'<div class="empty">目前沒有未完成事項</div>';
+ active.innerHTML=pending.length?pending.map(t=>'<div class="row"><button type="button" class="complete" data-complete="'+esc(t.id)+'" tabindex="-1">完成</button><button type="button" class="delete" data-delete="'+esc(t.id)+'" tabindex="-1">刪除</button><div class="card'+dueClass(t.date)+'" data-card="'+esc(t.id)+'" style="transform:translateX('+(openId===t.id?110:openId==='-'+t.id?-110:0)+'px)" tabindex="0"><div class="date">'+dateMarkup(t.date)+'</div><div class="text">'+esc(t.text)+'</div></div></div>').join(''):'<div class="empty">目前沒有未完成事項</div>';
  hint.hidden=!pending.length;doneArea.hidden=!complete.length;
- done.innerHTML=complete.map(t=>'<div class="done"><div class="date">'+dateText(t.date)+'</div><div><div class="text">'+esc(t.text)+'</div><div class="done-time">完成於 '+esc(t.completedLabel||'')+'</div></div></div>').join('');
+ done.innerHTML=complete.map(t=>'<div class="done"><div class="date">'+dateMarkup(t.date)+'</div><div><div class="text">'+esc(t.text)+'</div><div class="done-time">完成於 '+esc(t.completedLabel||'')+'</div></div></div>').join('');
  document.querySelectorAll('[data-complete]').forEach(b=>b.onclick=()=>completeTask(b.dataset.complete));
  document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteTask(b.dataset.delete));
  document.querySelectorAll('[data-card]').forEach(card=>{const id=card.dataset.card;let sx=0,sy=0,base=0,drag=false;
