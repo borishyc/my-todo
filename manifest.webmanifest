@@ -1,7 +1,7 @@
 {
-  "name": "My To-Do",
-  "short_name": "To-Do",
-  "description": "Google 登入同步的待辦事項 App",
+  "name": "TIDY",
+  "short_name": "TIDY",
+  "description": "TIDY 雲端同步待辦事項",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
