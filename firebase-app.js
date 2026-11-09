@@ -19,20 +19,15 @@ function setOpen(id){openId=id;render()}
 
 function detailMarkup(t){
  const logs=Object.values(t.history||{}).filter(h=>h.type==='change').sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
- const [year,month,day]=t.date.split('-').map(Number);
- const years=Array.from({length:12},(_,i)=>new Date().getFullYear()-2+i);
- if(!years.includes(year))years.push(year);
- years.sort((a,b)=>a-b);
- const opts=(values,selected)=>values.map(v=>'<option value="'+v+'"'+(Number(v)===selected?' selected':'')+'>'+v+'</option>').join('');
  return '<section class="detail"><div class="detail-head"><strong>修改任務</strong><button data-close type="button">關閉</button></div>'+
  '<label>任務名稱<input id="editText" maxlength="100" value="'+esc(t.text)+'"></label>'+
- '<label>到期日期</label><div class="date-selects"><select id="editYear" aria-label="年">'+opts(years,year)+'</select><span>年</span><select id="editMonth" aria-label="月">'+opts(Array.from({length:12},(_,i)=>i+1),month)+'</select><span>月</span><select id="editDay" aria-label="日">'+opts(Array.from({length:31},(_,i)=>i+1),day)+'</select><span>日</span></div>'+
+ '<label>到期日期<input id="editDate" type="date" value="'+esc(t.date)+'" aria-label="選擇到期日期"></label>'+
  '<button data-save="'+esc(t.id)+'" class="detail-save" type="button">儲存修改</button><h3>修改紀錄</h3>'+
  '<div class="history">'+(logs.length?logs.map(h=>'<div class="history-item"><small>'+esc(h.label||h.at||'')+'</small><div>'+esc(h.text||'')+'</div></div>').join(''):'尚無修改紀錄')+'</div></section>';
 }
 async function saveDetail(id){
  if(!ready())return;const t=tasks.find(x=>x.id===id);if(!t)return;
- const name=$('#editText').value.trim(),year=Number($('#editYear').value),month=Number($('#editMonth').value),day=Number($('#editDay').value),date=year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0'),d=new Date(year,month-1,day);
+ const name=$('#editText').value.trim(),date=$('#editDate').value,d=new Date(date+'T00:00:00');
  if(!name||!/^\d{4}-\d{2}-\d{2}$/.test(date)||isNaN(d)||d.getFullYear()!==Number(date.slice(0,4))||d.getMonth()+1!==Number(date.slice(5,7))||d.getDate()!==Number(date.slice(8,10))){error.textContent='請輸入正確的名稱與日期';return}
  const changes=[];
  if(name!==t.text)changes.push('名稱：'+t.text+' → '+name);
