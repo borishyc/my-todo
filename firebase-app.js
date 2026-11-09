@@ -18,52 +18,44 @@ function fail(e){console.error(e);error.textContent='操作失敗：'+(e.code||e
 function setOpen(id){openId=id;render()}
 
 function detailMarkup(t){
- const status=t.completedAt?'已完成':t.status||'未開始';
- const logs=Object.values(t.history||{}).sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
- return '<section class="detail"><div class="detail-head"><strong>任務追蹤</strong><button data-close type="button">關閉</button></div>'+
+ const logs=Object.values(t.history||{}).filter(h=>h.type==='change').sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
+ const [year,month,day]=t.date.split('-').map(Number);
+ const years=Array.from({length:12},(_,i)=>new Date().getFullYear()-2+i);
+ if(!years.includes(year))years.push(year);
+ years.sort((a,b)=>a-b);
+ const opts=(values,selected)=>values.map(v=>'<option value="'+v+'"'+(Number(v)===selected?' selected':'')+'>'+v+'</option>').join('');
+ return '<section class="detail"><div class="detail-head"><strong>修改任務</strong><button data-close type="button">關閉</button></div>'+
  '<label>任務名稱<input id="editText" maxlength="100" value="'+esc(t.text)+'"></label>'+
- '<label>到期日期<input id="editDate" type="date" value="'+esc(t.date)+'"></label>'+
- '<label>狀態<select id="editStatus">'+['未開始','進行中','已完成'].map(s=>'<option'+(s===status?' selected':'')+'>'+s+'</option>').join('')+'</select></label>'+
- '<button data-save="'+esc(t.id)+'" class="detail-save" type="button">儲存修改</button><h3>歷史備註與變更</h3>'+
- '<div class="history">'+(logs.length?logs.map(h=>'<div class="history-item"><small>'+esc(h.label||h.at||'')+'</small><div>'+esc(h.text||'')+'</div></div>').join(''):'尚無紀錄')+'</div>'+
- '<textarea id="newNote" maxlength="2000" rows="3" placeholder="新增進度或備註"></textarea><button class="detail-save" data-note="'+esc(t.id)+'" type="button">新增備註</button></section>';
+ '<label>到期日期</label><div class="date-selects"><select id="editYear" aria-label="年">'+opts(years,year)+'</select><span>年</span><select id="editMonth" aria-label="月">'+opts(Array.from({length:12},(_,i)=>i+1),month)+'</select><span>月</span><select id="editDay" aria-label="日">'+opts(Array.from({length:31},(_,i)=>i+1),day)+'</select><span>日</span></div>'+
+ '<button data-save="'+esc(t.id)+'" class="detail-save" type="button">儲存修改</button><h3>修改紀錄</h3>'+
+ '<div class="history">'+(logs.length?logs.map(h=>'<div class="history-item"><small>'+esc(h.label||h.at||'')+'</small><div>'+esc(h.text||'')+'</div></div>').join(''):'尚無修改紀錄')+'</div></section>';
 }
 async function saveDetail(id){
  if(!ready())return;const t=tasks.find(x=>x.id===id);if(!t)return;
- const name=$('#editText').value.trim(),date=$('#editDate').value,status=$('#editStatus').value,d=new Date(date+'T00:00:00');
+ const name=$('#editText').value.trim(),year=Number($('#editYear').value),month=Number($('#editMonth').value),day=Number($('#editDay').value),date=year+'-'+String(month).padStart(2,'0')+'-'+String(day).padStart(2,'0'),d=new Date(year,month-1,day);
  if(!name||!/^\d{4}-\d{2}-\d{2}$/.test(date)||isNaN(d)||d.getFullYear()!==Number(date.slice(0,4))||d.getMonth()+1!==Number(date.slice(5,7))||d.getDate()!==Number(date.slice(8,10))){error.textContent='請輸入正確的名稱與日期';return}
- const old=t.completedAt?'已完成':t.status||'未開始',changes=[];
+ const changes=[];
  if(name!==t.text)changes.push('名稱：'+t.text+' → '+name);
  if(date!==t.date)changes.push('日期：'+t.date+' → '+date);
- if(status!==old)changes.push('狀態：'+old+' → '+status);
  if(!changes.length){detailId=null;render();return}
  const now=new Date(),base='users/'+user.uid+'/tasks/'+id,key=push(ref(db,base+'/history')).key,patch={};
- patch[base+'/text']=name;patch[base+'/date']=date;patch[base+'/status']=status;
- patch[base+'/completedAt']=status==='已完成'?(t.completedAt||now.toISOString()):null;
- patch[base+'/completedLabel']=status==='已完成'?(t.completedLabel||stamp(now)):null;
+ patch[base+'/text']=name;patch[base+'/date']=date;
  patch[base+'/history/'+key]={at:now.toISOString(),label:stamp(now),text:changes.join('；'),type:'change'};
  busy=true;state();error.textContent='';
  try{await update(ref(db),patch);detailId=null;live.textContent='已更新任務'}catch(e){fail(e)}finally{busy=false;state()}
 }
-async function addNote(id){
- if(!ready())return;const note=$('#newNote')?.value.trim();if(!note)return;
- const now=new Date();busy=true;state();error.textContent='';
- try{await push(ref(db,'users/'+user.uid+'/tasks/'+id+'/history'),{at:now.toISOString(),label:stamp(now),text:note,type:'note'});live.textContent='備註已儲存'}catch(e){fail(e)}finally{busy=false;state()}
-}
-
 function render(){
  if(!user||!received){active.innerHTML='<div class="empty">'+(!user?'請先登入 Google 帳號':'正在讀取雲端事項…')+'</div>';doneArea.hidden=hint.hidden=true;return}
  const pending=tasks.filter(t=>!t.completedAt).sort((a,b)=>a.date.localeCompare(b.date));
  const complete=tasks.filter(t=>t.completedAt).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
- active.innerHTML=pending.length?pending.map(t=>'<div class="row"><button type="button" class="complete" data-complete="'+esc(t.id)+'" tabindex="-1">完成</button><button type="button" class="delete" data-delete="'+esc(t.id)+'" tabindex="-1">刪除</button><div class="card'+dueClass(t.date)+'" data-card="'+esc(t.id)+'" style="transform:translateX('+(openId===t.id?110:openId==='-'+t.id?-110:0)+'px)" tabindex="0"><div class="date">'+dateMarkup(t.date)+'</div><div class="text">'+esc(t.text)+'</div><button type="button" class="detail-open" data-detail="'+esc(t.id)+'">追蹤</button></div>'+(detailId===t.id?detailMarkup(t):'')+'</div>').join(''):'<div class="empty">目前沒有未完成事項</div>';
+ active.innerHTML=pending.length?pending.map(t=>'<div class="row"><button type="button" class="complete" data-complete="'+esc(t.id)+'" tabindex="-1">完成</button><button type="button" class="delete" data-delete="'+esc(t.id)+'" tabindex="-1">刪除</button><div class="card'+dueClass(t.date)+'" data-card="'+esc(t.id)+'" style="transform:translateX('+(openId===t.id?110:openId==='-'+t.id?-110:0)+'px)" tabindex="0"><div class="date">'+dateMarkup(t.date)+'</div><div class="text">'+esc(t.text)+'</div><button type="button" class="detail-open" data-detail="'+esc(t.id)+'">修改</button></div>'+(detailId===t.id?detailMarkup(t):'')+'</div>').join(''):'<div class="empty">目前沒有未完成事項</div>';
  hint.hidden=!pending.length;doneArea.hidden=!complete.length;
- done.innerHTML=complete.map(t=>'<div class="done"><div class="date">'+dateMarkup(t.date)+'</div><div><div class="text">'+esc(t.text)+'</div><div class="done-time">完成於 '+esc(t.completedLabel||'')+'</div><button type="button" class="detail-open" data-detail="'+esc(t.id)+'">追蹤 / 備註</button></div></div>'+(detailId===t.id?detailMarkup(t):'')).join('');
+ done.innerHTML=complete.map(t=>'<div class="done"><div class="date">'+dateMarkup(t.date)+'</div><div><div class="text">'+esc(t.text)+'</div><div class="done-time">完成於 '+esc(t.completedLabel||'')+'</div><button type="button" class="detail-open" data-detail="'+esc(t.id)+'">修改 / 紀錄</button></div></div>'+(detailId===t.id?detailMarkup(t):'')).join('');
  document.querySelectorAll('[data-complete]').forEach(b=>b.onclick=()=>completeTask(b.dataset.complete));
  document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteTask(b.dataset.delete));
  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{detailId=b.dataset.detail;openId=null;render();document.querySelector('.detail')?.scrollIntoView({block:'nearest'})});
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{detailId=null;render()});
  document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>saveDetail(b.dataset.save));
- document.querySelectorAll('[data-note]').forEach(b=>b.onclick=()=>addNote(b.dataset.note));
  document.querySelectorAll('[data-card]').forEach(card=>{const id=card.dataset.card;let sx=0,sy=0,base=0,drag=false;
  card.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;sx=e.clientX;sy=e.clientY;base=openId===id?110:openId==='-'+id?-110:0;drag=true;card.setPointerCapture(e.pointerId);card.style.transition='none'});
  card.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dy)>Math.abs(dx)+8)return;card.style.transform='translateX('+Math.max(-110,Math.min(110,base+dx))+'px)'});
